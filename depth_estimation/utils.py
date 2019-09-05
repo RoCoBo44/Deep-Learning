@@ -1,4 +1,5 @@
 import numpy as np
+import os
 from PIL import Image
 
 def DepthNorm(x, maxDepth):
@@ -36,7 +37,7 @@ def to_multichannel(i):
     i = i[:,:,0]
     return np.stack((i,i,i), axis=2)
         
-def display_images(outputs, inputs=None, gt=None, is_colormap=True, is_rescale=True):
+def display_images(outputs, inputs=None, gt=None, is_colormap=True, is_rescale=True, t = ()):
     import matplotlib.pyplot as plt
     import skimage
     from skimage.transform import resize
@@ -46,14 +47,20 @@ def display_images(outputs, inputs=None, gt=None, is_colormap=True, is_rescale=T
     shape = (outputs[0].shape[0], outputs[0].shape[1], 3)
     
     all_images = []
-
+    count = 0
     for i in range(outputs.shape[0]):
         imgs = []
-        
+
         if isinstance(inputs, (list, tuple, np.ndarray)):
             x = to_multichannel(inputs[i])
             x = resize(x, shape, preserve_range=True, mode='reflect', anti_aliasing=True )
             imgs.append(x)
+            test = imgs.copy()
+            x = test.pop()
+           # var,var2 = t[count*2],t[count*2+1]
+           # print(var)
+           # x = x.resize((var, var2), Image.ANTIALIAS) ALGO PASA CON EL RESIZE QUE NO ANDA
+            displayImage(x, count, text ='n_')
 
         if isinstance(gt, (list, tuple, np.ndarray)):
             x = to_multichannel(gt[i])
@@ -62,6 +69,7 @@ def display_images(outputs, inputs=None, gt=None, is_colormap=True, is_rescale=T
 
         if is_colormap:
             rescaled = outputs[i][:,:,0]
+
             if is_rescale:
                 rescaled = rescaled - np.min(rescaled)
                 rescaled = rescaled / np.max(rescaled)
@@ -69,12 +77,28 @@ def display_images(outputs, inputs=None, gt=None, is_colormap=True, is_rescale=T
         else:
             imgs.append(to_multichannel(outputs[i]))
 
+        test = imgs.copy()
+        x = test.pop()
+       # x = x.resize((t[count * 2], t[count * 2 + 1]), Image.ANTIALIAS)
+        displayImage(x,count)
+        count = count + 1
         img_set = np.hstack(imgs)
         all_images.append(img_set)
 
     all_images = np.stack(all_images)
-    
+
     return skimage.util.montage(all_images, multichannel=True, fill=(0,0,0))
+
+
+
+def displayImage(i, pos = 0, text = 'd_'):
+    import matplotlib.pyplot as plt
+
+    plt.imshow(i, interpolation='nearest')
+    plt.axis('off')
+    filename = 'img_'+ text + str(pos).zfill(4) + '.png'
+    plt.savefig(os.path.join('myTest_results', filename), bbox_inches='tight')
+    return 0
 
 def save_images(filename, outputs, inputs=None, gt=None, is_colormap=True, is_rescale=False):
     montage =  display_images(outputs, inputs, is_colormap, is_rescale)
