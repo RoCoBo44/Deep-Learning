@@ -18,7 +18,8 @@ from matplotlib import pyplot as plt
 # Argument Parser
 parser = argparse.ArgumentParser(description='High Quality Monocular Depth Estimation via Transfer Learning')
 parser.add_argument('--model', default='nyu.h5', type=str, help='Trained Keras model file.')
-parser.add_argument('--input', default='my_examples/*.jpg', type=str, help='Path to Video')
+parser.add_argument('--input', default='vi.mp4', type=str, help='Path to Video')
+parser.add_argument('--name', default='example', type=str, help='Name of Vid')
 args = parser.parse_args()
 
 # Custom object needed for inference and training
@@ -54,7 +55,7 @@ def display_single_image(output, inputs=None, is_colormap=True):
 
     imgs = []
 
-    imgs.append(inputs)
+    #imgs.append(inputs)
 
     ##rescale output
     out_min = np.min(output)
@@ -62,9 +63,11 @@ def display_single_image(output, inputs=None, is_colormap=True):
     output = output - out_min
     outputs = output/out_max
 
+
     if is_colormap:
         rescaled = outputs[:, :, 0]
         pred_x = plasma(rescaled)[:, :, :3]
+        plt.imshow(pred_x)
         imgs.append(pred_x)
 
     img_set = np.hstack(imgs)
@@ -83,8 +86,16 @@ while ret:
     pred = output.reshape(output.shape[1], output.shape[2], 1)
     img_set = display_single_image(pred, img_arr)
     plt.figure(figsize=(20, 10))
+    plt.axis('off')
     plt.imshow(img_set)
-    filename = 'img_' + str(count).zfill(4) + '.png'
-    plt.savefig(os.path.join('image_results', filename), bbox_inches='tight')
-
+    filename = 'img_' + args.name + '_' + str(count).zfill(4) + '_d.png'
+    plt.savefig(os.path.join('image_results', filename), bbox_inches='tight', pad_inches = 0)
+    plt.cla()
+    plt.figure(figsize=(20, 10))
+    plt.imshow(img_arr)
+    plt.axis('off')
+    filename = 'img_' + args.name + '_' + str(count).zfill(4) + '_n.png'
+    plt.savefig(os.path.join('image_results', filename), bbox_inches='tight', pad_inches = 0)
+    plt.cla()
+    plt.close()
 
