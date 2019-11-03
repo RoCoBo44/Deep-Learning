@@ -1,1 +1,3 @@
 depth_estimation/nyu.h5
+depth_estimation/image_results/*
+depth_estimation/MyTest_results/*

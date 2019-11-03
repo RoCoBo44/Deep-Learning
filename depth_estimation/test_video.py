@@ -19,7 +19,8 @@ from matplotlib import pyplot as plt
 parser = argparse.ArgumentParser(description='High Quality Monocular Depth Estimation via Transfer Learning')
 parser.add_argument('--model', default='nyu.h5', type=str, help='Trained Keras model file.')
 parser.add_argument('--input', default='vi.mp4', type=str, help='Path to Video')
-parser.add_argument('--name', default='example', type=str, help='Name of Vid')
+parser.add_argument('--name', default='test', type=str, help='Name of Vid')
+parser.add_argument('--count', default=0, type=int, help='Number to count')
 args = parser.parse_args()
 
 # Custom object needed for inference and training
@@ -74,7 +75,7 @@ def display_single_image(output, inputs=None, is_colormap=True):
 
     return img_set
 
-count = 0
+count = args.count
 ret = True
 while ret:
     ret, image = cap.read()
@@ -88,14 +89,14 @@ while ret:
     plt.figure(figsize=(20, 10))
     plt.axis('off')
     plt.imshow(img_set)
-    filename = 'img_' + args.name + '_' + str(count).zfill(4) + '_d.png'
-    plt.savefig(os.path.join('image_results', filename), bbox_inches='tight', pad_inches = 0)
+    filename = str(count).zfill(4) + '_d.png'
+    plt.savefig(os.path.join('image_results', args.name, filename), bbox_inches='tight', pad_inches = 0)
     plt.cla()
     plt.figure(figsize=(20, 10))
     plt.imshow(img_arr)
     plt.axis('off')
-    filename = 'img_' + args.name + '_' + str(count).zfill(4) + '_n.png'
-    plt.savefig(os.path.join('image_results', filename), bbox_inches='tight', pad_inches = 0)
+    filename = str(count).zfill(4) + '_n.png'
+    plt.savefig(os.path.join('image_results', args.name, filename), bbox_inches='tight', pad_inches = 0)
     plt.cla()
     plt.close()
 
